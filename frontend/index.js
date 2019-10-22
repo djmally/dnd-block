@@ -6,7 +6,7 @@ const style = require('./style');
 loadCSSFromString(style);
 const renderCharsheet = require('./charsheet/charsheet');
 
-function DiceRollerBlock() {
+function DnDBlock() {
     const base = UI.useBase();
     // TODO: write last 100 rolls to a table
     return (
