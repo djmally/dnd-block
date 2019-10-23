@@ -1,5 +1,4 @@
 import React from 'react';
-
 const Checkbox = ({name, isSelected, onCheckboxChange}) => (
     <input
     type="checkbox"
@@ -9,4 +8,4 @@ const Checkbox = ({name, isSelected, onCheckboxChange}) => (
     className="form-check-input"/>
 );
 
-module.exports = Checkbox;
+export default Checkbox;

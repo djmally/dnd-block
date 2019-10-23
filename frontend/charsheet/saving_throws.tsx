@@ -1,6 +1,6 @@
 import React from 'react';
 import {UI} from '@airtable/blocks';
-const Checkbox = require('../checkbox');
+import Checkbox from '../checkbox';
 
 function renderSavingThrows(base) {
     const savingThrowsTable = base.getTableByName('Saving Throws');
@@ -29,4 +29,4 @@ function renderSavingThrows(base) {
     );
 }
 
-module.exports = renderSavingThrows;
+export default renderSavingThrows;

@@ -1,4 +1,4 @@
-module.exports = `
+export default `
 .red {
   background: red;
 }
@@ -331,7 +331,7 @@ form.charsheet main section.combat > div.armorclass > div label, form.charsheet 
   padding-bottom: 5px;
   border-radius: 0 0 10px 10px;
 }
-form.charsheet main section.combat > div.armorclass > div input, form.charsheet main section.combat > div.initiative > div input, form.charsheet main section.combat > div.speed > div input {
+form.charsheet main section.combat > div.armorclass > div input, form.charsheet main section.combat > div.initiative > div div, form.charsheet main section.combat > div.speed > div input {
   height: 70px;
   width: 70px;
   border-radius: 10px;

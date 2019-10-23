@@ -31,4 +31,4 @@ function renderAbilityScores(base) {
     );
 }
 
-module.exports = renderAbilityScores;
+export default renderAbilityScores;

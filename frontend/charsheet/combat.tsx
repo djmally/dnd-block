@@ -1,7 +1,6 @@
 import React from 'react';
 import {UI} from '@airtable/blocks';
-
-const Checkbox = require('../checkbox');
+import Checkbox from '../checkbox';
 
 function renderArmorClass(base) {
     const acTable = base.getTableByName('AC');
@@ -31,7 +30,10 @@ function renderInitiative(base) {
     return (
         <div className="initiative">
             <div>
-            <label htmlFor="initiative">Initiative</label><input name="initiative" placeholder={dexterityBonus} type="text" />
+                <label htmlFor="initiative">Initiative</label>
+                <div name="initiative">
+                    {dexterityBonus} 
+                </div>
             </div>
         </div>
     );
@@ -111,4 +113,4 @@ function renderDeathSaves(base) {
     );
 }
 
-module.exports = {renderArmorClass, renderInitiative, renderSpeed, renderHitPoints, renderHitDice, renderDeathSaves}
+export default {renderArmorClass, renderInitiative, renderSpeed, renderHitPoints, renderHitDice, renderDeathSaves}

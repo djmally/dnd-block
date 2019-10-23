@@ -14,4 +14,4 @@ function renderProficiency(base) {
     );
 }
 
-module.exports = renderProficiency;
+export default renderProficiency;

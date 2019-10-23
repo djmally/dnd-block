@@ -1,10 +1,10 @@
-import {UI} from '@airtable/blocks';
 import React from 'react';
+import {UI} from '@airtable/blocks';
 import {loadCSSFromString} from '@airtable/blocks/ui';
 
-const style = require('./style');
+import style from './style';
 loadCSSFromString(style);
-const renderCharsheet = require('./charsheet/charsheet');
+import renderCharsheet from './charsheet/charsheet';
 
 function DnDBlock() {
     const base = UI.useBase();
@@ -26,13 +26,13 @@ function DnDBlock() {
 }
 
 function resetForm() {
-    setSides('');
-    setCount('');
-    setModifier('');
+    this.setSides('');
+    this.setCount('');
+    this.setModifier('');
 }
 
 function computeRoll() {
-    const rollString = document.getElementById('roll').value || 'd20+0';
+    const rollString = (document.getElementById('roll') as HTMLInputElement).value || 'd20+0';
     const {rolls, constants} = parseRoll(rollString);
     console.log(rolls, constants)
     const total = rolls.reduce((acc, n) => acc + n, 0) + constants.reduce((acc, n) => acc + n, 0);
@@ -46,10 +46,10 @@ function computeRoll() {
     } else {
         pad = '';
     }
-    document.querySelector('.result').innerText = `Rolling ${rollString}:\n${rolls.join(', ')}${pad}${constants.join(', ')} -> ${total}`;
+    (document.querySelector('.result') as HTMLDivElement).innerText = `Rolling ${rollString}:\n${rolls.join(', ')}${pad}${constants.join(', ')} -> ${total}`;
 }
 
-function parseRoll(rollString) {
+function parseRoll(rollString: string) {
     const opRegex = /([\+-])/
     const dieRegex = /\d*d\d+/
     const constRegex = /\d+/
@@ -65,7 +65,7 @@ function parseRoll(rollString) {
         } else if (dieRegex.test(token)) {
             const [count, sides] = token.split('d');
             console.log(token, "die", count, sides)
-            const randomRolls = rollDice(parseInt(count || 1), parseInt(sides));
+            const randomRolls = rollDice(parseInt(count || '1'), parseInt(sides));
             rolls.push(...randomRolls);
         } else if (constRegex.test(token)) {
             console.log(token, "const")
@@ -75,7 +75,7 @@ function parseRoll(rollString) {
     return {rolls, constants};
 }
 
-function rollDice(count, sides) {
+function rollDice(count: number, sides: number): Uint32Array {
     const buf = new Uint32Array(count);
     const randVals = window.crypto.getRandomValues(buf).map(val => (val % sides) + 1);
     return randVals
@@ -83,7 +83,7 @@ function rollDice(count, sides) {
 
 
 function setRoll(value) {
-    document.getElementById('roll').value = value;
+    (document.getElementById('roll') as HTMLInputElement).value = value;
 }
 
-UI.initializeBlock(() => <DiceRollerBlock />);
+UI.initializeBlock(() => <DnDBlock/>);

@@ -39,4 +39,4 @@ function renderCharacterDetails(base) {
     );
 }
 
-module.exports = renderCharacterDetails;
+export default renderCharacterDetails;

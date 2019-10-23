@@ -1,6 +1,6 @@
 import React from 'react';
 import {UI} from '@airtable/blocks';
-const Checkbox = require('../checkbox');
+import Checkbox from '../checkbox';
 
 function renderSkills(base) {
     const skillsTable = base.getTableByName('Skills');
@@ -50,4 +50,4 @@ function renderPassivePerception(base) {
     )
 }
 
-module.exports = {renderSkills, renderPassivePerception};
+export default {renderSkills, renderPassivePerception};

@@ -1,14 +1,15 @@
 import React from 'react';
+import renderAbilityScores from './ability_scores';
+import _skills from './skills';
+const {renderSkills, renderPassivePerception} = _skills;
+import _combat from './combat';
+const {renderArmorClass, renderInitiative, renderSpeed, renderHitPoints, renderHitDice, renderDeathSaves} = _combat;
+import renderCharacterDetails from './character_details';
+import renderProficiency from './proficiency';
+import renderSavingThrows from './saving_throws';
+import Checkbox from '../checkbox';
 
-const renderAbilityScores = require('./ability_scores');
-const {renderSkills, renderPassivePerception} = require('./skills');
-const {renderArmorClass, renderInitiative, renderSpeed, renderHitPoints, renderHitDice, renderDeathSaves} = require('./combat');
-const renderCharacterDetails = require('./character_details');
-const renderProficiency = require('./proficiency');
-const renderSavingThrows = require('./saving_throws');
-const Checkbox = require('../checkbox');
-
-module.exports = function(base) {
+export default function(base) {
   const inspirationBox = (
     <div className="inspiration box">
       <div className="label-container">
