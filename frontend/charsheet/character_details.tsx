@@ -1,42 +1,43 @@
 import React from 'react';
-import {UI} from '@airtable/blocks';
+import {Box, Heading, Text, useRecords, useBase} from '@airtable/blocks/ui';
 
-function _renderClassLevels(base) {
+function _ClassLevels() {
+    const base = useBase();
     const classesTable = base.getTableByName('Classes');
     const queryResult = classesTable.selectRecords();
-    const records = UI.useRecords(queryResult);
+    const records = useRecords(queryResult);
     return (
-        <>
-        <label htmlFor="classlevel">Classes</label>
+        <Box display="flex" flexDirection="column" paddingX={4}>
+        <Heading>Classes</Heading>
         {records.map(record => {
             const className = record.primaryCellValueAsString || '';
             const classLevels = record.getCellValueAsString('Levels');
             const subclass = record.getCellValueAsString('Subclass');
+            // TODO:
             const classFeatures = record.getCellValueAsString('Class Features');
             return (
-                <li key={record.id}>
-                    <div className="classlevel" name="classlevel">{className} ({subclass}) {classLevels}</div>
-                </li>
+                <Text key={record.id}>
+                    {className} ({subclass}) {classLevels}
+                </Text>
             );
         })}
-        </>
+        </Box>
     );
 }
 
-function renderCharacterDetails(base) {
-    const characterName = UI.useRecords(base.getTableByName('Player Details').selectRecords())[0].getCellValueAsString('Name');
+export function CharacterDetails() {
+    const base = useBase();
+    const characterName = useRecords(base.getTableByName('Player Details').selectRecords())[0].getCellValueAsString('Name');
+    const characterDetails = (
+        <Box display="flex" flexDirection="column" paddingX={4}>
+        <Heading className="charname">Character Name</Heading>
+        <Text className="charname">{characterName}</Text>
+        </Box>
+    );
     return (
-        <>
-        <section className="charname">
-        <label htmlFor="charname">Character Name</label><div className="charname" name="charname">{characterName}</div>
-        </section>
-        <section className="misc">
-            <ul>
-                {_renderClassLevels(base)}
-            </ul>
-        </section>
-        </>
+        <Box display="flex" style={{padding: 4, border: '3px solid #ddd', flexDirection: 'row'}}>
+            {characterDetails}
+            <_ClassLevels/>
+        </Box>
     );
 }
-
-export default renderCharacterDetails;

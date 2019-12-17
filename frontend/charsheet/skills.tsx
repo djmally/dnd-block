@@ -1,43 +1,55 @@
 import React from 'react';
-import {UI} from '@airtable/blocks';
-import Checkbox from '../checkbox';
+import {Box, Heading, Text, useRecords, useBase} from '@airtable/blocks/ui';
+import Checkbox from './checkbox';
+import {Rollable} from './rollable';
 
-function renderSkills(base) {
+export function Skills() {
+    const base = useBase();
     const skillsTable = base.getTableByName('Skills');
     const queryResult = skillsTable.selectRecords();
-    const records = UI.useRecords(queryResult);
+    const records = useRecords(queryResult);
     const skillList = records.map(record => {
         const skill = record.primaryCellValueAsString || '';
-        const htmlFor = `${skill}skill`;
         const skillBonusStat = record.getCellValueAsString('Bonus Stat');
         const skillBonus = record.getCellValueAsString('Bonus');
         const isProficient = record.getCellValueAsString('Proficient');
+        const modifier = parseInt(skillBonus) || 0;
         return (
-            <li key={record.id}>
-                <label htmlFor={htmlFor}>{skill}
-                    <span className="skill">({skillBonusStat})</span>
-                </label>
-                <div className="skill" name={skill} type="text">{skillBonus}</div>
-                <Checkbox name={`${skill}-prof`} isSelected={isProficient === 'checked'} onCheckboxChange={() => {false}}/>
-            </li>
+            <Rollable key={record.id} style={{padding: 4}} modifier={modifier}>
+            <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                width="70px"
+                height="70px"
+                backgroundColor="blueLight2"
+                style={{borderRadius: "10px"}}
+            >
+                <div style={{display: 'flex'}}>{skill}</div>
+                <div style={{display: 'flex'}}>{parseInt(skillBonus) >= 0 ? `+${skillBonus}` : skillBonus}</div>
+                <div style={{display: 'flex'}}>{skillBonusStat}</div>
+            </Box>
+            <Checkbox name={`${skill}-prof`} isSelected={isProficient === 'checked'} mutationHook={async isChecked => await skillsTable.updateRecordAsync(record.id, {'Proficient': isChecked})}/>
+            </Rollable>
         );
     });
 
     return (
-        <section className="skills">
-        <ul>
+        <div className="skills" style={{padding: 4, border: '3px solid #ddd', display: 'flex', flexWrap: 'wrap', flexDirection: 'column', width: '400px', maxHeight: '490px'}}>
+            <Heading>Skills</Heading>
             {skillList}
-        </ul>
-        </section>
+        </div>
     );
 }
 
-function renderPassivePerception(base) {
-    const proficiency = parseInt(UI.useRecords(base.getTableByName('Proficiency').selectRecords())[0].primaryCellValueAsString || '0');
+export function PassivePerception() {
+    const base = useBase();
+    const proficiency = parseInt(useRecords(base.getTableByName('Proficiency').selectRecords())[0].primaryCellValueAsString || '0');
 
     const abilityScoresTable = base.getTableByName('Ability Scores');
     const queryResult = abilityScoresTable.selectRecords();
-    const records = UI.useRecords(queryResult);
+    const records = useRecords(queryResult);
     const wisdomRecord = records.filter(record => {
         const abilityScore = record.primaryCellValueAsString || '';
         return abilityScore === 'Wisdom';
@@ -46,8 +58,9 @@ function renderPassivePerception(base) {
     const wisdomBonus = parseInt(wisdomRecord.getCellValueAsString('Bonus'));
 
     return (
-        <div className="passive-perception">{10 + wisdomBonus + proficiency}</div>
-    )
+        <>
+        <Heading>Passive Wisdom (Perception)</Heading>
+        <Text>{10 + wisdomBonus + proficiency}</Text>
+        </>
+    );
 }
-
-export default {renderSkills, renderPassivePerception};
