@@ -1,6 +1,6 @@
 import React from 'react';
 import {Box, Heading, useBase, useRecords} from '@airtable/blocks/ui';
-import Checkbox from './checkbox';
+import {Checkbox} from './checkbox';
 import {Rollable} from './rollable';
 
 export function SavingThrows() {

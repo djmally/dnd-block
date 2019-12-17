@@ -1,44 +1,51 @@
 import React, {useState} from 'react';
 import {base} from '@airtable/blocks';
-import {Heading, Text, useRecords, useGlobalConfig} from '@airtable/blocks/ui';
+import {Button, Text, useRecords, useGlobalConfig} from '@airtable/blocks/ui';
 import {Table} from '@airtable/blocks/models';
 
 export const lastRollResultKey = 'last_roll_result';
 
-// TODO: make this a floating component
 export function DiceRoller() {
     const globalConfig = useGlobalConfig();
     const [rollString, setRollString] = useState('1d20+0');
     const rollTable = base.getTableByName('Roll History');
     const queryResult = rollTable.selectRecords();
     const records = useRecords(queryResult);
-    const result = globalConfig.get(lastRollResultKey) as {preamble: string, arrow: string, result: string};
+    const rollResult = globalConfig.get(lastRollResultKey) as {preamble: string, arrow: string, result: string};
+    let rollSection;
+    if (rollResult !== undefined) {
+        rollSection = (
+            <>
+            <Text>{rollResult.preamble}</Text>
+            <Text>{rollResult.arrow}</Text>
+            <Text>{rollResult.result}</Text>
+            </>
+        );
+    } else {
+        rollSection = null;
+    }
+    // TODO: allow for advantage/disadvantage
     return (
         <div style={{
             position: 'fixed',
             top: 20,
             right: 20,
-            backgroundColor: '#0C9',
-            color: '#FFF',
+            backgroundColor: '#EEE',
             borderRadius: '50',
             textAlign: 'center',
             boxShadow: '2px 2px 3px #999',
         }}>
-            <Heading>Roll:</Heading>
             <input type="text" id="roll" onChange={event => setRollString(event.target.value)} placeholder="d20+0"/>
-            <button onClick={async () => {
+            <Button onClick={async () => {
                 const rollResult = await computeRoll(rollString);
                 await globalConfig.setAsync(lastRollResultKey, rollResult)
                 if (records.length > 100) {
                     const numberOfRecordsToDelete = records.length - 100;
                     await rollTable.deleteRecordsAsync(records.slice(0,numberOfRecordsToDelete));
                 }
-             }}>Roll Dice</button>
-            <button onClick={resetForm}>Reset</button>
+             }}>Roll Dice</Button>
             <div className="result">
-                <Text>{result.preamble}</Text>
-                <Text>{result.arrow}</Text>
-                <Text>{result.result}</Text>
+                {rollSection}
             </div>
         </div>
     );
@@ -102,10 +109,4 @@ export function rollDice(count: number, sides: number): Uint32Array {
     const buf = new Uint32Array(count);
     const randVals = window.crypto.getRandomValues(buf).map(val => (val % sides) + 1);
     return randVals
-}
-
-function resetForm() {
-    this.setSides('');
-    this.setCount('');
-    this.setModifier('');
 }

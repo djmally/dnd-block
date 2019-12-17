@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Heading, Text, useRecords, useBase} from '@airtable/blocks/ui';
-import Checkbox from './checkbox';
+import {Checkbox} from './checkbox';
 
 export function ArmorClass() {
     const base = useBase();

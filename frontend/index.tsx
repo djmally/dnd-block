@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import {useBase, initializeBlock} from '@airtable/blocks/ui';
-import {DiceRoller} from './dice_roller';
+import {initializeBlock, useGlobalConfig} from '@airtable/blocks/ui';
+import {DiceRoller, lastRollResultKey} from './dice_roller';
 import Charsheet from './charsheet/charsheet';
 
 function DnDBlock() {

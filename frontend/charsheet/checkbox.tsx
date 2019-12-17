@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import { useGlobalConfig } from '@airtable/blocks/ui';
+import {useGlobalConfig} from '@airtable/blocks/ui';
 
-function Checkbox(props: {name: string, isSelected: boolean, mutationHook?: (isChecked: boolean) => Promise<void>}) {
+export function Checkbox(props: {name: string, isSelected: boolean, mutationHook?: (isChecked: boolean) => Promise<void>}) {
     const globalConfig = useGlobalConfig();
     const key = `${props.name}-checkbox`
     const [isChecked, setIsChecked] = useState(props.isSelected);
@@ -27,5 +27,3 @@ function Checkbox(props: {name: string, isSelected: boolean, mutationHook?: (isC
         />
     );
 }
-
-export default Checkbox;

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Box, Heading, Text, useRecords, useBase} from '@airtable/blocks/ui';
+import {Checkbox} from './checkbox';
 
 function _ClassLevels() {
     const base = useBase();
@@ -21,6 +22,8 @@ function _ClassLevels() {
                 </Text>
             );
         })}
+        <label htmlFor="inspiration">Inspiration</label>
+        <Checkbox name="inspiration" isSelected={false}/>
         </Box>
     );
 }
