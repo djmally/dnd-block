@@ -1,7 +1,8 @@
 import React from 'react';
 import {Box, Heading, Text, useRecords, useBase} from '@airtable/blocks/ui';
 import {Checkbox} from './checkbox';
-import {Rollable} from './rollable';
+import {RollableGridBox, boxMargin, boxMinHeight} from '../ui/rollable_grid_box';
+import {abilityScoreBoxHeight} from './ability_scores';
 
 export function Skills() {
     const base = useBase();
@@ -15,31 +16,22 @@ export function Skills() {
         const isProficient = record.getCellValueAsString('Proficient');
         const modifier = parseInt(skillBonus) || 0;
         return (
-            <Rollable key={record.id} style={{padding: 4}} modifier={modifier}>
-            <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                width="70px"
-                height="70px"
-                backgroundColor="blueLight2"
-                style={{borderRadius: "10px"}}
-            >
-                <div style={{display: 'flex'}}>{skill}</div>
-                <div style={{display: 'flex'}}>{parseInt(skillBonus) >= 0 ? `+${skillBonus}` : skillBonus}</div>
-                <div style={{display: 'flex'}}>{skillBonusStat}</div>
-            </Box>
-            <Checkbox name={`${skill}-prof`} isSelected={isProficient === 'checked'} mutationHook={async isChecked => await skillsTable.updateRecordAsync(record.id, {'Proficient': isChecked})}/>
-            </Rollable>
+            <RollableGridBox key={record.id} style={{padding: 4}} modifier={modifier} description={skill}>
+                <Text>{skill}</Text>
+                <Text>{parseInt(skillBonus) >= 0 ? `+${skillBonus}` : skillBonus}</Text>
+                <Text>{`(${skillBonusStat})`}</Text>
+                <Checkbox name={`${skill}-prof`} isSelected={isProficient === 'checked'} mutationHook={async isChecked => await skillsTable.updateRecordAsync(record.id, {'Proficient': isChecked})}/>
+            </RollableGridBox>
         );
     });
 
     return (
-        <div className="skills" style={{padding: 4, border: '3px solid #ddd', display: 'flex', flexWrap: 'wrap', flexDirection: 'column', width: '400px', maxHeight: '490px'}}>
-            <Heading>Skills</Heading>
-            {skillList}
-        </div>
+        <Box display="flex" flexWrap="wrap" flexDirection="row" height={abilityScoreBoxHeight} className="skills" style={{padding: 4, border: '3px solid #ddd'}}>
+            <Heading style={{height: 50, width: 'fill', borderTop: '3px solid #ddd', borderBottom: '3px solid #ddd'}}>Skills</Heading>
+            <Box display="flex" flexWrap="wrap" flexDirection="row" maxWidth={800}>
+                {skillList}
+            </Box>
+        </Box>
     );
 }
 

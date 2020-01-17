@@ -1,6 +1,9 @@
 import React from 'react';
-import {Box, useRecords, Heading, useBase} from '@airtable/blocks/ui';
-import {Rollable} from './rollable';
+import {Box, Text, useRecords, Heading, useBase} from '@airtable/blocks/ui';
+import {RollableGridBox, boxMargin, boxMinHeight} from '../ui/rollable_grid_box';
+
+const abilityScoreCount = 6;
+export const abilityScoreBoxHeight = (boxMinHeight + (boxMargin * 4)) * abilityScoreCount + 20;
 
 export function AbilityScores() {
     const base = useBase();
@@ -9,33 +12,21 @@ export function AbilityScores() {
     const records = useRecords(queryResult);
     const abilityScoreList = records.map(record => {
         const abilityScore = record.primaryCellValueAsString || '';
-        const stat = record.getCellValueAsString('Stat');
-        const statBonus = record.getCellValueAsString('Bonus');
+        const stat = record.getCellValue('Stat');
+        const statBonus = record.getCellValue('Bonus') as number;
         return (
-            <Rollable key={record.id}>
-                <Box
-                    className="score rollable"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    width="70px"
-                    height="70px"
-                    backgroundColor="blueLight2"
-                    style={{borderRadius: "10px"}}
-                >
-                        <div style={{display: 'flex'}}>{abilityScore}</div>
-                        <div style={{display: 'flex'}}>{parseInt(statBonus) >= 0 ? `+${statBonus}` : statBonus}</div>
-                        <div style={{display: 'flex'}}>{stat}</div>
-                </Box>
-            </Rollable>
+            <RollableGridBox key={record.id} modifier={statBonus} description={abilityScore}>
+                <Text>{abilityScore}</Text>
+                <Text>{statBonus >= 0 ? `+${statBonus}` : statBonus}</Text>
+                <Text>{stat}</Text>
+            </RollableGridBox>
         );
     });
 
     return (
-        <div className="scores" style={{padding: 4, border: '3px solid #ddd', flexDirection: 'column'}}>
-            <Heading>Ability Scores</Heading>
+        <Box display="flex" flexDirection="column" className="scores" style={{padding: 4, border: '3px solid #ddd', height: abilityScoreBoxHeight}}>
+            <Heading style={{borderTop: '3px solid #ddd', borderBottom: '3px solid #ddd'}}>Ability Scores</Heading>
             {abilityScoreList}
-        </div>
+        </Box>
     );
 }

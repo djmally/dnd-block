@@ -2,7 +2,7 @@ import React from 'react';
 import {computeRoll, lastRollResultKey} from '../dice_roller';
 import {useGlobalConfig} from '@airtable/blocks/ui';
 
-interface RollableProps {
+export interface RollableProps {
     numDice?: number,
     dieSides?: number,
     modifier?: number,
@@ -14,10 +14,14 @@ interface RollableProps {
 export function Rollable(props: RollableProps) {
     const globalConfig = useGlobalConfig();
     // TODO: globalConfig is slow af
+    const style = {
+        cursor: 'pointer',
+        ...props.style,
+    }
     return (
         <div
             className="rollable"
-            style={props.style}
+            style={style}
             onClick={async () => {
                 const modifier = props.modifier || 0;
                 const op = modifier >= 0 ? '+' : '';

@@ -1,6 +1,10 @@
 import React, {useState} from 'react';
-import {Heading, Text, useRecords, useBase} from '@airtable/blocks/ui';
+import {Box, Button, Heading, Text, Select, useRecords, useBase, expandRecordPickerAsync, useGlobalConfig} from '@airtable/blocks/ui';
 import {Checkbox} from './checkbox';
+import { Rollable } from '../ui/rollable';
+import { SelectOption } from '@airtable/blocks/dist/types/src/ui/select_and_select_buttons_helpers';
+
+const attackRollAbilityScoreGlobalConfigKey = 'attackRollAbilityScore';
 
 export function ArmorClass() {
     const base = useBase();
@@ -18,6 +22,59 @@ export function ArmorClass() {
     );
 }
 
+export function AttackRoll() {
+    const base = useBase();
+    const globalConfig = useGlobalConfig()
+    const storedAbilityScoreRecordId: string | null = globalConfig.get(attackRollAbilityScoreGlobalConfigKey) as string | null | undefined || null;
+    const [abilityScoreRecordId, setAbilityScoreRecordId] = useState(storedAbilityScoreRecordId);
+
+    const proficiencyBonus = parseInt(useRecords(base.getTableByName('Proficiency').selectRecords())[0].primaryCellValueAsString || '0');
+    const formattedProficiencyBonus = proficiencyBonus > 0 ? ` + ${proficiencyBonus}` : ` - ${Math.abs(proficiencyBonus)}`;
+
+    const abilityScoresTable = base.getTableByName('Ability Scores');
+    const queryResult = abilityScoresTable.selectRecords();
+    const abilityScoreRecords = useRecords(queryResult);
+
+    const options: Array<SelectOption> = [{value: null, label: 'Choose an ability score...', disabled: true}];
+    const recordOptions = abilityScoreRecords.map(record => { return {value: record.id, label: record.primaryCellValue as string} });
+    options.push(...recordOptions);
+
+    let bonus: number;
+    let formattedBonus: string;
+    if (abilityScoreRecordId !== null) {
+        const abilityScoreRecord = queryResult.getRecordById(abilityScoreRecordId);
+        bonus = abilityScoreRecord.getCellValue('Bonus') as number;
+        formattedBonus = bonus > 0 ? ` + ${bonus}` : ` - ${Math.abs(bonus)}`;
+    } else {
+        bonus = 0;
+        formattedBonus = ' + 0';
+    }
+
+    // TODO: layout is jank
+    return (
+        <Box display="flex" flexDirection="column">
+        <Heading>Attack Roll</Heading>
+        <Text>Ability Score</Text>
+        <Select
+            onChange={newRecordId => {
+                setAbilityScoreRecordId(newRecordId as string | null);
+                if (newRecordId === null) {
+                    globalConfig.setAsync(attackRollAbilityScoreGlobalConfigKey, undefined);
+                } else {
+                    globalConfig.setAsync(attackRollAbilityScoreGlobalConfigKey, newRecordId);
+                }
+            }}
+            value={abilityScoreRecordId}
+            options={options}
+            style={{width: 200}}
+        />
+        <Rollable modifier={bonus + proficiencyBonus} description="Attack Roll">
+            <Button>Roll</Button>
+        </Rollable>
+        </Box>
+    );
+}
+
 export function Initiative() {
     const base = useBase();
     const abilityScoresTable = base.getTableByName('Ability Scores');
@@ -28,27 +85,13 @@ export function Initiative() {
         return abilityScore === 'Dexterity';
     })[0];
 
-    const dexterityBonus = dexterityRecord.getCellValueAsString('Bonus');
+    const dexterityBonus = dexterityRecord.getCellValue('Bonus') as number;
 
     return (
-        <>
+        <Rollable modifier={dexterityBonus} description="Initiative">
         <Heading>Initiative</Heading>
         <Text>{dexterityBonus}</Text>
-        </>
-    );
-}
-
-export function Speed() {
-    const base = useBase();
-    const raceTable = base.getTableByName('Race');
-    const queryResult = raceTable.selectRecords();
-    const raceRecord = useRecords(queryResult)[0];
-    const speed = raceRecord.getCellValueAsString('Speed') || '0'
-    return (
-        <>
-        <Heading>Speed</Heading>
-        <Text>{speed}</Text>
-        </>
+        </Rollable>
     );
 }
 
@@ -87,17 +130,12 @@ export function HitDice() {
     const queryResult = hpTable.selectRecords();
     const hpRecord = useRecords(queryResult)[0];
     return (
-        <div className="hitdice">
-          <div>
-            <div className="total">
-              <label htmlFor="totalhd">Total</label>
-                {hpRecord.getCellValueAsString('Hit Dice')}
-            </div>
-            <div className="remaining">
-              <label htmlFor="remaininghd">Hit Dice</label>
-            </div>
-          </div>
-        </div>
+        <>
+        <Heading>Hit Dice</Heading>
+        <Text>Total: </Text>
+        <Text>{hpRecord.getCellValueAsString('Hit Dice')}</Text>
+        <Text>Remaining: </Text>
+        </>
     );
 }
 

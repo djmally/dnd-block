@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {base} from '@airtable/blocks';
-import {Button, Text, useRecords, useGlobalConfig} from '@airtable/blocks/ui';
+import {Box, Button, Input, Text, useRecords, useGlobalConfig} from '@airtable/blocks/ui';
 import {Table} from '@airtable/blocks/models';
+import { Checkbox } from './charsheet/checkbox';
 
 export const lastRollResultKey = 'last_roll_result';
 
@@ -26,28 +27,40 @@ export function DiceRoller() {
     }
     // TODO: allow for advantage/disadvantage
     return (
-        <div style={{
-            position: 'fixed',
-            top: 20,
-            right: 20,
-            backgroundColor: '#EEE',
-            borderRadius: '50',
-            textAlign: 'center',
-            boxShadow: '2px 2px 3px #999',
-        }}>
-            <input type="text" id="roll" onChange={event => setRollString(event.target.value)} placeholder="d20+0"/>
-            <Button onClick={async () => {
-                const rollResult = await computeRoll(rollString);
-                await globalConfig.setAsync(lastRollResultKey, rollResult)
-                if (records.length > 100) {
-                    const numberOfRecordsToDelete = records.length - 100;
-                    await rollTable.deleteRecordsAsync(records.slice(0,numberOfRecordsToDelete));
-                }
-             }}>Roll Dice</Button>
+        <Box
+            style={{
+                position: 'fixed',
+                top: 5,
+                right: 5,
+                backgroundColor: '#FFF',
+                borderRadius: '50',
+                textAlign: 'center',
+                boxShadow: '2px 2px 3px #999',
+            }}
+        >
+            <Input style={{background: '#EEE'}} type="text" value={rollString} id="roll" onChange={event => setRollString(event.target.value)} placeholder="1d20+0"/>
+            <Box display="flex">
+                <Button variant="primary" onClick={async () => {
+                    const rollResult = await computeRoll(rollString);
+                    await globalConfig.setAsync(lastRollResultKey, rollResult)
+                    if (records.length > 100) {
+                        const numberOfRecordsToDelete = records.length - 100;
+                        await rollTable.deleteRecordsAsync(records.slice(0,numberOfRecordsToDelete));
+                    }
+                }}>Roll Dice</Button>
+                <div>
+                    <Text>Advantage</Text>
+                    <Checkbox name="advantage" isSelected={false}/>
+                </div>
+                <div>
+                    <Text>Disadvantage</Text>
+                    <Checkbox name="disadvantage" isSelected={false}/>
+                </div>
+            </Box>
             <div className="result">
                 {rollSection}
             </div>
-        </div>
+        </Box>
     );
 }
 
@@ -68,10 +81,11 @@ export async function computeRoll(rollString: string, description?: string): Pro
     }
     const rollTable = base.getTableByName('Roll History');
     await writeRollHistory(rollTable, rollString, clampedTotal);
+    const formattedDescription = description !== undefined && description.length > 0 ? ` (${description})` : '';
     return {
         preamble: `Rolling ${rollString}:\n${rolls.join('+')}${pad}${constants.join('')}`,
         arrow: `↪️`,
-        result: `${clampedTotal}${description || ''}`
+        result: `${clampedTotal}${formattedDescription}`
     };
 }
 
